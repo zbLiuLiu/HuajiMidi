@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="./inc/shim/Base64.js"></script>
+    <script src="./inc/shim/Base64binary.js"></script>
+    <script src="./inc/shim/WebAudioAPI.js"></script>
+    <script src="./inc/shim/WebMIDIAPI.js" type="text/javascript"></script>
+
+    <!-- jasmid package -->
+    <script src="./inc/jasmid/stream.js"></script>
+    <script src="./inc/jasmid/midifile.js"></script>
+    <script src="./inc/jasmid/replayer.js"></script>
+
+    <script src="./js/midi/audioDetect.js" type="text/javascript"></script>
+    <script src="./js/midi/gm.js"></script>
+    <script src="./js/midi/loader.js"></script>
+    <script src="./js/midi/plugin.audiotag.js"></script>
+    <script src="./js/midi/plugin.webaudio.js"></script>
+    <script src="./js/midi/plugin.webmidi.js"></script>
+    <script src="./js/midi/player.js" type="text/javascript"></script>
+    <script src="./js/midi/audioDetect.js"></script>
+    <script src="./js/util/dom_request_xhr.js" type="text/javascript"></script>
+    <script src="./js/util/dom_request_script.js" type="text/javascript"></script>
+    <style>
+        body {
+            margin: 0px;
+            padding: 0px;
+        }
+
+        select,
+        button {
+            border: 1px solid black;
+            background-color: transparent;
+            outline: none;
+            font-weight: 400;
+            padding: 1px 6px;
+        }
+
+        .huaji {
+            background-color: transparent;
+            background-image: url('./images/huaji1.png');
+            background-repeat: no-repeat;
+            background-size: contain;
+            width: 28px;
+            padding: 0px;
+            padding-top: 59px;
+            border: 0px;
+            outline: 0px;
+            appearance: none;
+        }
+
+        .huaji.down {
+            background-image: url('./images/huaji2.png');
+        }
+
+        #openFile {
+            display: none;
+        }
+
+        .play-mode {
+            overflow: auto;
+            word-wrap: none;
+            white-space: nowrap;
+            position: fixed;
+            bottom: 0px;
+            left: 0px;
+            right: 0px;
+        }
+
+        .play-mode .huaji {
+            width: 56px;
+            padding-top: 118px;
+        }
+
+        #time {
+            width: 40%;
+            pointer-events: none;
+        }
+
+        .options>* {
+            vertical-align: middle;
+        }
+
+        .options {
+            padding: 10px 0px;
+            overflow: auto;
+            word-wrap: none;
+            white-space: nowrap;
+        }
+
+        .options>*:first-child {
+            margin-left: 8px !important;
+        }
+
+        .options>*:last-child {
+            margin-right: 8px !important;
+        }
+
+        #keyboard {
+            margin: auto 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="options">
+        <select onchange="openUrl('./midis/'+this.value+'.mid')">
+            <option value="1" disabled selected>选择预置的乐谱</option>
+            <optgroup label="万恶之源">
+                <option value="Astronomia">Astronomia</option>
+                <option value="aLIEz">aLIEz</option>
+            </optgroup>
+            <optgroup label="火星文">
+                <option value="aLIEz">aLIEz</option>
+            </optgroup>
+            <optgroup label="某科学的超电磁炮">
+                <option value="Only my railgun (full ver)">Only my railgun</option>
+                <option value="Level 5 - Judgelight">Level 5 - Judgelight</option>
+                <option value="Sister's Noise">Sister's Noise</option>
+            </optgroup>
+            <optgroup label="LoveLive!">
+                <option value="SnowHalation">Snow Halation</option>
+                <option value="Arifutarekanashiminohate">ありふれた悲しみの果て</option>
+            </optgroup>
+        </select>
+        <input type="file" id="openFile" accept="audio/midi" onchange="openFile()">
+        <button onclick="document.getElementById('openFile').click()">打开</button>
+        <button id="play" onclick="play()">播放</button>
+        <input type="range" id="time" value="0" readonly>
+        <button onclick="stop()">停止</button>
+        <label><input type="checkbox" onchange="modeChange()">弹奏模式</label>
+    </div>
+    <div style="margin: 0px 8px;"><i>如果你发现音乐好像有哪里不对，点一下停止然后重新开始播放就好！</i></div>
+    <div id="keyboard">
+    </div>
+    <!-- <script src="midi.min.js"></script> -->
+    <script>
+        console.log(MIDI)
+        var player;
+        window.onload = function () {
+            var press = false;
+            var setPressTimeout;
+            var keyboard = document.getElementById("keyboard")
+            var buttons = []
+            var time = document.getElementById("time")
+            // console.log({keyboard})
+            for (let index = 0; index < 88; index++) {
+                var button = document.createElement("BUTTON")
+                button.className = 'huaji';
+                // button.classList.add("huaji")
+                button.onmousedown = function () {
+                    this.classList.add("down")
+                    keyDown(index + 21)
+                    press = true
+                }
+                button.onmouseenter = function () {
+                    if (press) {
+                        this.classList.add("down")
+                        keyDown(index + 21)
+                        if (setPressTimeout) clearTimeout(setPressTimeout)
+                    }
+                    // console.log(index + 21 + "enter")
+                }
+                button.onmouseup = function () {
+                    this.classList.remove("down")
+                    keyUp(index + 21)
+                    press = false
+                }
+                button.onmouseleave = function () {
+                    this.classList.remove("down")
+                    keyUp(index + 21)
+                    if (press) setPressTimeout = setTimeout(function () {
+                        press = false
+                    }, 500);
+                }
+                button.innerText = MIDI.noteToKey[index + 21]
+                buttons.push(button)
+                keyboard.appendChild(button)
+            }
+            MIDI.loadPlugin({
+                soundfontUrl: "./soundfont/",
+                instruments: "acoustic_grand_piano",
+                onprogress: function (state, progress) {
+                    // console.log(state, progress);
+                },
+                onsuccess: function () {
+                    var delay = 0; // play one note every quarter second
+                    var note = 50; // the MIDI note
+                    var velocity = 127; // how hard the note hits
+                    player = MIDI.Player
+                    player.addListener(function (data) {
+                        // console.log(data)
+                        var pianoKey = data.note - 21;
+                        // console.log('note', MIDI.noteToKey[data.note])
+                        if (data.message == 144) {
+                            time.value = data.now
+                            time.max = data.end
+                            buttons[pianoKey] && buttons[pianoKey].classList.add("down")
+                        } else {
+                            buttons[pianoKey] && buttons[pianoKey].classList.remove("down")
+                        }
+                    });
+                    player.timeWarp = 1; // speed the song is played back
+                    // play the note
+                    MIDI.setVolume(0, 127);
+                }
+            });
+            function keyDown(note) {
+                MIDI.noteOn(0, note, 127, 0);
+            }
+            function keyUp(note) {
+                MIDI.noteOff(0, note, 0);
+            }
+        };
+        function openFile() {
+            // console.log("openFile",document.getElementById('openFile').files)
+            if (document.getElementById('openFile').files.length > 0 && player) {
+                playUrl(URL.createObjectURL(document.getElementById('openFile').files[0]))
+            }
+        }
+        function openUrl(url) {
+            player && playUrl(url)
+        }
+        function playUrl(url) {
+            // console.log(player)
+            player.loadFile(url, function () {
+                player.start()
+                document.getElementById("play").innerText = "暂停"
+            });
+
+        }
+        function modeChange() {
+            var keyboard = document.getElementById("keyboard")
+            keyboard.classList[keyboard.classList.contains("play-mode") ? "remove" : "add"]("play-mode")
+        }
+        function play() {
+            if (player && player.currentTime !== player.endTime) {
+                if (player.playing) {
+                    document.getElementById("play").innerText = "播放"
+                    player.pause(true);
+                } else {
+                    document.getElementById("play").innerText = "暂停"
+                    player.resume();
+                }
+            }
+        }
+        function stop() {
+            if (player) {
+                document.getElementById("play").innerText = "播放"
+                player.stop();
+            }
+        }
+    </script>
+</body>
+
+</html>
