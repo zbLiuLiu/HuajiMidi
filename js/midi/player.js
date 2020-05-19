@@ -143,7 +143,8 @@
           d = c - s;
           var x = l[0].event;
           if ("channel" === x.type) {
-            var u = x.channel;
+            var u = 0;
+            // var u = x.channel;
             switch (x.subtype) {
               case "noteOn":
                 if (MIDI.channels[u].mute)

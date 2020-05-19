@@ -25,8 +25,10 @@
 				res.byId[--num] = 
 				res.byName[clean(instrument)] = 
 				res.byCategory[clean(key)] = {
-					id: clean(instrument),
-					instrument: instrument,
+					// id: clean(instrument),
+					// instrument: instrument,
+					id: clean('Acoustic Grand Piano'),
+					instrument: 'Acoustic Grand Piano',
 					number: num,
 					category: key
 				};
@@ -50,6 +52,23 @@
 		'Ethnic': ['105 Sitar', '106 Banjo', '107 Shamisen', '108 Koto', '109 Kalimba', '110 Bagpipe', '111 Fiddle', '112 Shanai'],
 		'Percussive': ['113 Tinkle Bell', '114 Agogo', '115 Steel Drums', '116 Woodblock', '117 Taiko Drum', '118 Melodic Tom', '119 Synth Drum'],
 		'Sound effects': ['120 Reverse Cymbal', '121 Guitar Fret Noise', '122 Breath Noise', '123 Seashore', '124 Bird Tweet', '125 Telephone Ring', '126 Helicopter', '127 Applause', '128 Gunshot']
+
+		// 'Piano': ['1 Acoustic Grand Piano', '2 Acoustic Grand Piano', '3 Acoustic Grand Piano', '4 Acoustic Grand Piano', '5 Acoustic Grand Piano', '6 Acoustic Grand Piano', '7 Acoustic Grand Piano', '8 Acoustic Grand Piano'],
+		// 'Chromatic Percussion': ['9 Acoustic Grand Piano', '10 Acoustic Grand Piano', '11 Acoustic Grand Piano', '12 Acoustic Grand Piano', '13 Acoustic Grand Piano', '14 Acoustic Grand Piano', '15 Acoustic Grand Piano', '16 Acoustic Grand Piano'],
+		// 'Organ': ['17 Acoustic Grand Piano', '18 Acoustic Grand Piano', '19 Acoustic Grand Piano', '20 Acoustic Grand Piano', '21 Acoustic Grand Piano', '22 Acoustic Grand Piano', '23 Acoustic Grand Piano', '24 Acoustic Grand Piano'],
+		// 'Guitar': ['25 Acoustic Grand Piano', '26 Acoustic Grand Piano', '27 Acoustic Grand Piano', '28 Acoustic Grand Piano', '29 Acoustic Grand Piano', '30 Acoustic Grand Piano', '31 Acoustic Grand Piano', '32 Acoustic Grand Piano'],
+		// 'Bass': ['33 Acoustic Grand Piano', '34 Acoustic Grand Piano', '35 Acoustic Grand Piano', '36 Acoustic Grand Piano', '37 Acoustic Grand Piano', '38 Acoustic Grand Piano', '39 Acoustic Grand Piano', '40 Acoustic Grand Piano'],
+		// 'Strings': ['41 Acoustic Grand Piano', '42 Acoustic Grand Piano', '43 Acoustic Grand Piano', '44 Acoustic Grand Piano', '45 Acoustic Grand Piano', '46 Acoustic Grand Piano', '47 Acoustic Grand Piano', '48 Acoustic Grand Piano'],
+		// 'Ensemble': ['49 Acoustic Grand Piano', '50 Acoustic Grand Piano', '51 Acoustic Grand Piano', '52 Acoustic Grand Piano', '53 Acoustic Grand Piano', '54 Acoustic Grand Piano', '55 Acoustic Grand Piano', '56 Acoustic Grand Piano'],
+		// 'Brass': ['57 Acoustic Grand Piano', '58 Acoustic Grand Piano', '59 Acoustic Grand Piano', '60 Acoustic Grand Piano', '61 Acoustic Grand Piano', '62 Acoustic Grand Piano', '63 Acoustic Grand Piano', '64 Acoustic Grand Piano'],
+		// 'Reed': ['65 Acoustic Grand Piano', '66 Acoustic Grand Piano', '67 Acoustic Grand Piano', '68 Acoustic Grand Piano', '69 Acoustic Grand Piano', '70 Acoustic Grand Piano', '71 Acoustic Grand Piano', '72 Acoustic Grand Piano'],
+		// 'Pipe': ['73 Acoustic Grand Piano', '74 Acoustic Grand Piano', '75 Acoustic Grand Piano', '76 Acoustic Grand Piano', '77 Acoustic Grand Piano', '78 Acoustic Grand Piano', '79 Acoustic Grand Piano', '80 Acoustic Grand Piano'],
+		// 'Synth Lead': ['81 Acoustic Grand Piano', '82 Acoustic Grand Piano', '83 Acoustic Grand Piano', '84 Acoustic Grand Piano', '85 Acoustic Grand Piano', '86 Acoustic Grand Piano', '87 Acoustic Grand Piano', '88 Acoustic Grand Piano'],
+		// 'Synth Pad': ['89 Acoustic Grand Piano', '90 Acoustic Grand Piano', '91 Acoustic Grand Piano', '92 Acoustic Grand Piano', '93 Acoustic Grand Piano', '94 Acoustic Grand Piano', '95 Acoustic Grand Piano', '96 Acoustic Grand Piano'],
+		// 'Synth Effects': ['97 Acoustic Grand Piano', '98 Acoustic Grand Piano', '99 Acoustic Grand Piano', '100 Acoustic Grand Piano', '101 Acoustic Grand Piano', '102 Acoustic Grand Piano', '103 Acoustic Grand Piano', '104 Acoustic Grand Piano'],
+		// 'Ethnic': ['105 Acoustic Grand Piano', '106 Acoustic Grand Piano', '107 Acoustic Grand Piano', '108 Acoustic Grand Piano', '109 Acoustic Grand Piano', '110 Acoustic Grand Piano', '111 Acoustic Grand Piano', '112 Acoustic Grand Piano'],
+		// 'Percussive': ['113 Acoustic Grand Piano', '114 Acoustic Grand Piano', '115 Acoustic Grand Piano', '116 Acoustic Grand Piano', '117 Acoustic Grand Piano', '118 Acoustic Grand Piano', '119 Acoustic Grand Piano'],
+		// 'Sound effects': ['120 Acoustic Grand Piano', '121 Acoustic Grand Piano', '122 Acoustic Grand Piano', '123 Acoustic Grand Piano', '124 Acoustic Grand Piano', '125 Acoustic Grand Piano', '126 Acoustic Grand Piano', '127 Acoustic Grand Piano', '128 Acoustic Grand Piano']
 	});
 
 	/* get/setInstrument

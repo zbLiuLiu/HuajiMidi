@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>とある滑稽の超电子琴</title>
     <script src="./inc/shim/Base64.js"></script>
     <script src="./inc/shim/Base64binary.js"></script>
     <script src="./inc/shim/WebAudioAPI.js"></script>
@@ -45,12 +45,17 @@
             background-image: url('./images/huaji1.png');
             background-repeat: no-repeat;
             background-size: contain;
-            width: 28px;
+            width: 32px;
             padding: 0px;
             padding-top: 59px;
-            border: 0px;
+            border: 2px solid transparent;
             outline: 0px;
             appearance: none;
+        }
+        .huaji:hover,
+        .huaji.down{
+            border-bottom-color: rgb(232, 167, 84);
+            cursor: pointer;
         }
 
         .huaji.down {
@@ -102,6 +107,7 @@
 
         #keyboard {
             margin: auto 8px;
+            user-select: none;
         }
     </style>
 </head>
@@ -112,7 +118,8 @@
             <option value="1" disabled selected>选择预置的乐谱</option>
             <optgroup label="万恶之源">
                 <option value="Astronomia">Astronomia</option>
-                <option value="aLIEz">aLIEz</option>
+                <option value="Ikenaibodarain">禁绝边境线</option>
+                <option value="GokuRakuJoudo">极乐净土</option>
             </optgroup>
             <optgroup label="火星文">
                 <option value="aLIEz">aLIEz</option>
@@ -126,6 +133,9 @@
                 <option value="SnowHalation">Snow Halation</option>
                 <option value="Arifutarekanashiminohate">ありふれた悲しみの果て</option>
             </optgroup>
+            <optgroup label="一抹多x">
+                <option value="Eromangasensai">ヒトリゴト</option>
+            </optgroup>
         </select>
         <input type="file" id="openFile" accept="audio/midi" onchange="openFile()">
         <button onclick="document.getElementById('openFile').click()">打开</button>
@@ -135,12 +145,13 @@
         <label><input type="checkbox" onchange="modeChange()">弹奏模式</label>
     </div>
     <div style="margin: 0px 8px;"><i>如果你发现音乐好像有哪里不对，点一下停止然后重新开始播放就好！</i></div>
-    <div id="keyboard">
+    <div id="keyboard" oncontextmenu="return false">
     </div>
     <!-- <script src="midi.min.js"></script> -->
     <script>
         console.log(MIDI)
         var player;
+
         window.onload = function () {
             var press = false;
             var setPressTimeout;
@@ -152,35 +163,103 @@
                 var button = document.createElement("BUTTON")
                 button.className = 'huaji';
                 // button.classList.add("huaji")
-                button.onmousedown = function () {
-                    this.classList.add("down")
-                    keyDown(index + 21)
-                    press = true
+                function down_press(e) {
+                    var button = e.target
+                    if (!button.press) {
+                        button.classList.add("down")
+                        keyDown(index + 21)
+                        press = true
+                    }
                 }
-                button.onmouseenter = function () {
-                    if (press) {
-                        this.classList.add("down")
+                function down_move(e) {
+                    var button = e.target
+                    if (press && !button.press) {
+                        button.classList.add("down")
                         keyDown(index + 21)
                         if (setPressTimeout) clearTimeout(setPressTimeout)
                     }
                     // console.log(index + 21 + "enter")
                 }
-                button.onmouseup = function () {
-                    this.classList.remove("down")
+                function up_press(e) {
+                    var button = e.target
+                    button.classList.remove("down")
                     keyUp(index + 21)
                     press = false
                 }
-                button.onmouseleave = function () {
-                    this.classList.remove("down")
+                function up_move(e) {
+                    var button = e.target
+                    button.classList.remove("down")
                     keyUp(index + 21)
+                    button.press = false
                     if (press) setPressTimeout = setTimeout(function () {
                         press = false
                     }, 500);
+                }
+                button.down_press = button.onmousedown = down_press
+                button.down_move = button.onmouseenter = down_move
+                button.up_press = button.onmouseup = up_press
+                button.up_move = button.onmouseleave = up_move
+                button.ontouchstart = function (event) {
+                    // console.log("touchStart", event)
+                    // event.preventDefault();
+                    down_press(event);
+                    this.lastPostionWasHere = true
+                    this.press = true;
+                }
+                button.ontouchend = function (event) {
+                    // console.log("touchEnd", event)
+                    // event.preventDefault();
+                    for (const index in buttons) {
+                        if (buttons.hasOwnProperty(index)) {
+                            const button = buttons[index];
+                            button.up_press({target: button})
+                        }
+                    }
+                    this.press = false;
+                }
+                button.ontouchenter = function (event) {
+                    console.log("touchEnter", event)
                 }
                 button.innerText = MIDI.noteToKey[index + 21]
                 buttons.push(button)
                 keyboard.appendChild(button)
             }
+            document.addEventListener("touchmove", function (event) {
+                // event.preventDefault();
+                // console.groupCollapsed("TouchMove")
+                for (const key in event.changedTouches) {
+                    if (event.changedTouches.hasOwnProperty(key)) {
+                        const touch = event.changedTouches[key];
+                        for (const index in buttons) {
+                            if (buttons.hasOwnProperty(index)) {
+                                const button = buttons[index];
+                                if (touch.pageX > button.offsetLeft && touch.pageX < button.offsetLeft + button.offsetWidth && touch.pageY > button.offsetTop && touch.pageY < button.offsetTop + button.offsetHeight) {
+                                    if (!button.lastPostionWasHere) {
+                                        button.down_move({target: button})
+                                        // console.log("MoveIn")
+                                        // console.log(button)
+                                        // console.log(button.offsetLeft, button.offsetWidth)
+                                        // console.log(button.offsetTop, button.offsetHeight)
+                                        button.lastPostionWasHere = true
+                                    }
+                                } else {
+                                    if (button.lastPostionWasHere) {
+                                        button.up_move({target: button})
+                                        // console.log("MoveOut")
+                                        // console.log(button)
+                                        // console.log(button.offsetLeft, button.offsetWidth)
+                                        // console.log(button.offsetTop, button.offsetHeight)
+                                        button.lastPostionWasHere = false
+                                    }
+                                }
+                            }
+                        }
+                        // console.log(touch.pageX, touch.pageY)
+                    }
+                }
+                if (!(event.path.length > 4 && (event.path[event.path.length - 5].classList.contains("options") || event.path[event.path.length - 5].classList.contains("play-mode")))) event.preventDefault()
+                // console.groupEnd()
+            }, {passive: false})
             MIDI.loadPlugin({
                 soundfontUrl: "./soundfont/",
                 instruments: "acoustic_grand_piano",
@@ -197,8 +276,8 @@
                         var pianoKey = data.note - 21;
                         // console.log('note', MIDI.noteToKey[data.note])
                         if (data.message == 144) {
-                            time.value = data.now
-                            time.max = data.end
+                            time.value = data.now*1000
+                            time.max = data.end*1000
                             buttons[pianoKey] && buttons[pianoKey].classList.add("down")
                         } else {
                             buttons[pianoKey] && buttons[pianoKey].classList.remove("down")
