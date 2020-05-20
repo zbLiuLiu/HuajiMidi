@@ -52,8 +52,9 @@
             outline: 0px;
             appearance: none;
         }
+
         .huaji:hover,
-        .huaji.down{
+        .huaji.down {
             border-bottom-color: rgb(232, 167, 84);
             cursor: pointer;
         }
@@ -195,13 +196,15 @@
                         press = false
                     }, 500);
                 }
-                button.down_press = button.onmousedown = down_press
-                button.down_move = button.onmouseenter = down_move
+                button.touchMode = button.press = false
+                button.down_press = button.onmousedown = function (e) {if (this.touchMode) this.touchMode = false; else down_press(e)}
+                button.down_move = button.onmouseenter = function (e) {if (this.touchMode) this.touchMode = false; else down_move(e)}
                 button.up_press = button.onmouseup = up_press
                 button.up_move = button.onmouseleave = up_move
                 button.ontouchstart = function (event) {
                     // console.log("touchStart", event)
                     // event.preventDefault();
+                    this.touchMode = true
                     down_press(event);
                     this.lastPostionWasHere = true
                     this.press = true;
@@ -235,6 +238,7 @@
                                 const button = buttons[index];
                                 if (touch.pageX > button.offsetLeft && touch.pageX < button.offsetLeft + button.offsetWidth && touch.pageY > button.offsetTop && touch.pageY < button.offsetTop + button.offsetHeight) {
                                     if (!button.lastPostionWasHere) {
+                                        button.touchMode = true
                                         button.down_move({target: button})
                                         // console.log("MoveIn")
                                         // console.log(button)
@@ -276,8 +280,8 @@
                         var pianoKey = data.note - 21;
                         // console.log('note', MIDI.noteToKey[data.note])
                         if (data.message == 144) {
-                            time.value = data.now*1000
-                            time.max = data.end*1000
+                            time.value = data.now * 1000
+                            time.max = data.end * 1000
                             buttons[pianoKey] && buttons[pianoKey].classList.add("down")
                         } else {
                             buttons[pianoKey] && buttons[pianoKey].classList.remove("down")
