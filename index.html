@@ -198,7 +198,7 @@
                 }
                 button.touchMode = button.press = false
                 button.down_press = button.onmousedown = function (e) {if (this.touchMode) this.touchMode = false; else down_press(e)}
-                button.down_move = button.onmouseenter = function (e) {if (this.touchMode) this.touchMode = false; else down_move(e)}
+                button.down_move = button.onmouseenter = function (e) {if (!this.touchMode) down_move(e)}
                 button.up_press = button.onmouseup = up_press
                 button.up_move = button.onmouseleave = up_move
                 button.ontouchstart = function (event) {
@@ -212,10 +212,16 @@
                 button.ontouchend = function (event) {
                     // console.log("touchEnd", event)
                     // event.preventDefault();
-                    for (const index in buttons) {
-                        if (buttons.hasOwnProperty(index)) {
-                            const button = buttons[index];
-                            button.up_press({target: button})
+                    for (const key in event.changedTouches) {
+                        if (event.changedTouches.hasOwnProperty(key)) {
+                            const touch = event.changedTouches[key];
+                            for (const index in buttons) {
+                                if (buttons.hasOwnProperty(index)) {
+                                    const button = buttons[index];
+                                    if (touch.target === button) continue;
+                                    button.up_press({target: button})
+                                }
+                            }
                         }
                     }
                     this.press = false;
@@ -238,7 +244,6 @@
                                 const button = buttons[index];
                                 if (touch.pageX > button.offsetLeft && touch.pageX < button.offsetLeft + button.offsetWidth && touch.pageY > button.offsetTop && touch.pageY < button.offsetTop + button.offsetHeight) {
                                     if (!button.lastPostionWasHere) {
-                                        button.touchMode = true
                                         button.down_move({target: button})
                                         // console.log("MoveIn")
                                         // console.log(button)
@@ -280,12 +285,12 @@
                         var pianoKey = data.note - 21;
                         // console.log('note', MIDI.noteToKey[data.note])
                         if (data.message == 144) {
-                            time.value = data.now * 1000
-                            time.max = data.end * 1000
                             buttons[pianoKey] && buttons[pianoKey].classList.add("down")
                         } else {
                             buttons[pianoKey] && buttons[pianoKey].classList.remove("down")
                         }
+                        time.value = data.now * 1000
+                        time.max = data.end * 1000
                     });
                     player.timeWarp = 1; // speed the song is played back
                     // play the note
